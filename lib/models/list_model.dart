@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:grocery_list/models/grocery_item_model.dart';
 
 class ListModel{
@@ -7,9 +8,11 @@ class ListModel{
   final String name;
   final bool isFavourite;
   final bool isSelected;
-  int index;
+  final int index;
+  final Timestamp? lastUpdated;
   List<GroceryItemModel> _items = [];
   UnmodifiableListView<GroceryItemModel> get items => UnmodifiableListView(_items);
+
 
   ListModel({
     required this.id,
@@ -17,8 +20,10 @@ class ListModel{
     required this.isFavourite,
     required this.isSelected,
     required this.index,
+    this.lastUpdated,
   });
 
+  //temp placeholder
   double get total => 10.4;
 
   //serialization
@@ -27,6 +32,7 @@ class ListModel{
     final int index = data['index'];
     final bool isSelected = data['isSelected'] ?? false;
     final bool isFavourite = data['isFavourite'] ?? false;
+    final Timestamp lastUpdated = data['lastUpdated'] ?? Timestamp.now();
     final List<GroceryItemModel> items = data['items'] ?? [];
 
     ListModel newList = ListModel(
@@ -34,9 +40,9 @@ class ListModel{
       index: index,
       name: name,
       isSelected: isSelected,
-      isFavourite: isFavourite
+      isFavourite: isFavourite,
+      lastUpdated: lastUpdated,
     );
-
     newList._items = items;
     return newList;
   }
@@ -49,6 +55,7 @@ class ListModel{
       'name': name,
       'isSelected': isSelected,
       'isFavourite': isFavourite,
+      'lastUpdated': lastUpdated,
     };
   }
 
