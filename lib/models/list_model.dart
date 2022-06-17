@@ -12,7 +12,7 @@ class ListModel{
   final Timestamp? lastUpdated;
   List<GroceryItemModel> _items = [];
   UnmodifiableListView<GroceryItemModel> get items => UnmodifiableListView(_items);
-
+  Timestamp get curTime => Timestamp.now();
 
   ListModel({
     required this.id,
@@ -24,7 +24,7 @@ class ListModel{
   });
 
   //temp placeholder
-  double get total => 10.4;
+  double get total => 10.42;
 
   //serialization
   factory ListModel.fromMap(Map<String, dynamic> data, String documentId) {
