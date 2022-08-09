@@ -1,7 +1,4 @@
-import 'dart:collection';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:grocery_list/models/grocery_item_model.dart';
 
 class ListModel{
   final String id;
@@ -10,8 +7,8 @@ class ListModel{
   final bool isSelected;
   final int index;
   final Timestamp? lastUpdated;
-  List<GroceryItemModel> _items = [];
-  UnmodifiableListView<GroceryItemModel> get items => UnmodifiableListView(_items);
+  // List _items = [];
+  // UnmodifiableListView get items => UnmodifiableListView(_items);
   Timestamp get curTime => Timestamp.now();
 
   ListModel({
@@ -24,7 +21,7 @@ class ListModel{
   });
 
   //temp placeholder
-  double get total => 10.42;
+  double get total => getTotalFromItems();
 
   //serialization
   factory ListModel.fromMap(Map<String, dynamic> data, String documentId) {
@@ -33,7 +30,7 @@ class ListModel{
     final bool isSelected = data['isSelected'] ?? false;
     final bool isFavourite = data['isFavourite'] ?? false;
     final Timestamp lastUpdated = data['lastUpdated'] ?? Timestamp.now();
-    final List<GroceryItemModel> items = data['items'] ?? [];
+    // final List items = data['items'] ?? [];
 
     ListModel newList = ListModel(
       id: documentId,
@@ -43,10 +40,18 @@ class ListModel{
       isFavourite: isFavourite,
       lastUpdated: lastUpdated,
     );
-    newList._items = items;
+    // newList._items = items;
     return newList;
   }
 
+  double getTotalFromItems() {
+    double listTotal = 0.00;
+    // for(ListItemModel item in items) {
+    //   listTotal += (item.costPerItem * item.quantity);
+    // }
+
+    return listTotal;
+  }
 
   Map<String, dynamic> toMap() {
     return {

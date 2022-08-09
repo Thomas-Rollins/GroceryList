@@ -45,7 +45,6 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-
 # config
 lib/firebase_options.dart
 pubspec.lock
