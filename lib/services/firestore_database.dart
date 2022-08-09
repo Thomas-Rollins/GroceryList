@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:grocery_list/models/grocery_item_model.dart';
+import 'package:grocery_list/models/list_item_model.dart';
 import 'package:grocery_list/models/list_model.dart';
+import 'package:grocery_list/models/user_item_model.dart';
 import 'package:grocery_list/services/firestore_path.dart';
 import 'package:grocery_list/services/firestore_service.dart';
 

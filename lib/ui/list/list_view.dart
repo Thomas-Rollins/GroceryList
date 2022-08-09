@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:grocery_list/app_localizations.dart';
 import 'package:grocery_list/models/grocery_item_model.dart';
+import 'package:grocery_list/models/list_item_model.dart';
+import 'package:grocery_list/models/user_item_model.dart';
 import 'package:grocery_list/providers/auth_provider.dart';
 import 'package:grocery_list/services/firestore_database.dart';
 import 'package:grocery_list/ui/list/empty_content.dart';
