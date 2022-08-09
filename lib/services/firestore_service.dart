@@ -4,9 +4,10 @@ It contains all generic implementation needed based on the provided document
 path and documentID,since most of the time in FirebaseFirestore design, we will have
 documentID and path for any document and collections.
  */
-import 'package:async/async.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import 'package:rxdart/rxdart.dart';
 
 class FirestoreService {
   FirestoreService._();
@@ -15,15 +16,14 @@ class FirestoreService {
   Future<void> set({
     required String path,
     required Map<String, dynamic> data,
-    bool merge = false,
+    bool merge = true,
   }) async {
     final reference = FirebaseFirestore.instance.doc(path);
     if (kDebugMode) {
       print('$path: $data');
     }
-    await reference.set(data);
+    await reference.set(data, SetOptions(merge: merge));
   }
-
 
   Future<void> deleteData({required String path}) async {
     final reference = FirebaseFirestore.instance.doc(path);
@@ -67,16 +67,6 @@ class FirestoreService {
 
   Stream<List> mergeStreams<T>({
     required Iterable<Stream<T>> streams
-  }) {
-    return StreamZip(streams);
-  }
-
-
-  static Stream<T> merge<T>(Iterable<Stream<T>> streams) {
-      var group = StreamGroup<T>();
-      streams.forEach(group.add);
-      group.close();
-      return group.stream;
-  }
+  }) => Rx.combineLatestList(streams);
 
 }

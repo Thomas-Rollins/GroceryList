@@ -21,7 +21,6 @@ class ListsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
-    // final firestoreDatabase = Provider.of<FirestoreDatabase>(context, listen: false);
 
     return Scaffold(
       key: _scaffoldKey,
@@ -100,15 +99,15 @@ class ListsScreen extends StatelessWidget {
               );
             } else {
               return EmptyContentWidget(
-                title: AppLocalizations.of(context).translate("todosEmptyTopMsgDefaultTxt"),
-                message: AppLocalizations.of(context).translate("todosEmptyBottomDefaultMsgTxt"),
+                title: AppLocalizations.of(context).translate("listsEmptyTopMsgDefaultTxt"),
+                message: AppLocalizations.of(context).translate("listsEmptyBottomDefaultMsgTxt"),
                 key: const Key('EmptyContentWidget'),
               );
             }
           } else if (snapshot.hasError) {
             return EmptyContentWidget(
-              title: AppLocalizations.of(context).translate("todosErrorTopMsgTxt"),
-              message: AppLocalizations.of(context).translate("todosErrorBottomMsgTxt"),
+              title: AppLocalizations.of(context).translate("listsErrorTopMsgTxt"),
+              message: AppLocalizations.of(context).translate("listsErrorBottomMsgTxt"),
               key: const Key('EmptyContentWidget'),
             );
           }
@@ -175,9 +174,10 @@ class ListsScreen extends StatelessWidget {
                     floatingActionButton: FloatingActionButton(
                       child: const Icon(Icons.add),
                       onPressed: () {
-                        Navigator.of(context).pushNamed(
-                          Routes.create_edit_list,
-                        );
+                        // #TODO: set up new item page
+                        // Navigator.of(context).pushNamed(
+                        //   Routes.create_edit_list,
+                        // );
                       },
                     ),
                     body: ItemsScreen(listId: lists[index].id),

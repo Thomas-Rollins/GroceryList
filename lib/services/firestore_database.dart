@@ -13,17 +13,98 @@ class FirestoreDatabase {
   final _firestoreService = FirestoreService.instance;
 
   // create/update listModel
-  Future<void> setList(ListModel list) async => await _firestoreService.set(
+  Future<void> setList(ListModel list) async {
+    try {
+      await _firestoreService.set(
         path: FirestorePath.groceryList(uid, list.id),
         data: list.toMap(),
       );
+    } catch (err) {
+      if (kDebugMode) {
+        print(err);
+      }
+    }
+  }
+
+  // create/update ListItemModel
+  Future<void> setListItem(ListItemModel listItem, String listId) async {
+    try {
+      await _firestoreService.set(
+        path: FirestorePath.listItemDetails(uid, listId, listItem.id),
+        data: listItem.toMap(),
+      );
+    } catch (err) {
+      if (kDebugMode) {
+        print(err);
+      }
+    }
+  }
+
+  // create/update UserItemModel
+  Future<void> setUserItem(UserItemModel userItem, String listId) async {
+    try {
+      await _firestoreService.set(
+        path: FirestorePath.item(uid, userItem.id),
+        data: userItem.toMap(),
+      );
+    } catch (err) {
+      if (kDebugMode) {
+        print(err);
+      }
+    }
+  }
+
+  // create/update GroceryItemModel
+  Future<void> setGroceryItem(GroceryItemModel groceryItem, String listId) async {
+    // update iff more than the id is provided.
+    if (groceryItem.userItem.toMap().keys.length > 1) {
+      if (groceryItem.groceryListItem.toMap().keys.length == 1) {
+        try {
+          await setUserItem(groceryItem.userItem, listId);
+        } catch (err) {
+          if (kDebugMode) {
+            print(err);
+          }
+        }
+        // both models need to be updated
+      } else {
+        try {
+          await Future.wait(
+            [
+              setUserItem(groceryItem.userItem, listId),
+              setListItem(groceryItem.groceryListItem, listId),
+            ],
+          );
+        } catch (err) {
+          if (kDebugMode) {
+            print(err);
+          }
+        }
+      }
+      // only one model needs updated
+    } else if (groceryItem.groceryListItem.toMap().keys.length > 1) {
+      try {
+        await setListItem(
+          groceryItem.groceryListItem,
+          listId,
+        );
+      } catch (err) {
+        if (kDebugMode) {
+          print(err);
+        }
+      }
+    }
+  }
 
   // delete list entry
   Future<void> deleteList(ListModel list) async {
-    if (kDebugMode) {
-      print("Delete UID: $uid");
+    try {
+      await _firestoreService.deleteData(path: FirestorePath.groceryList(uid, list.id));
+    } catch (err) {
+      if (kDebugMode) {
+        print(err);
+      }
     }
-    await _firestoreService.deleteData(path: FirestorePath.groceryList(uid, list.id));
   }
 
   // retrieve listModel based on the given listId
@@ -68,10 +149,8 @@ class FirestoreDatabase {
       );
 
   // retrieve all item data for list
-
   Stream<List> groceryItemStream({required String listId}) => _firestoreService.mergeStreams(streams: [
         userItemsStream(listId: listId),
         listItemsStream(listId: listId),
       ]);
 }
-// a0eZOHBMtzU12V98Neudb8ohLPS2
