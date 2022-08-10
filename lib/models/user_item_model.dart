@@ -26,7 +26,7 @@ class UserItemModel {
     String id = documentId;
     String? name = data['name'];
     String? brand = data['brand'];
-    double? costPerItem = data['cost'];
+    double? costPerItem = data['costPerItem'];
     String? category = data['category'];
     bool? isFavourite = data['isFavourite'];
     Timestamp? lastUpdated = data['lastUpdated'];

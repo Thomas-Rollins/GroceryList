@@ -34,19 +34,6 @@ class ListsScreen extends StatelessWidget {
                   : AppLocalizations.of(context).translate("homeAppBarTitle"));
             }),
         actions: <Widget>[
-          // StreamBuilder(
-          //     stream: firestoreDatabase.listsStream(),
-          //     builder: (context, snapshot) {
-          //       if (snapshot.hasData) {
-          //         List<ListModel> lists = snapshot.data as List<ListModel>;
-          //         return Visibility(visible: lists.isNotEmpty ? true : false, child: const Text("Extra actions"));
-          //       } else {
-          //         return const SizedBox(
-          //           width: 0,
-          //           height: 0,
-          //         );
-          //       }
-          //     }),
           IconButton(
               icon: const Icon(Icons.settings),
               onPressed: () {
@@ -63,7 +50,6 @@ class ListsScreen extends StatelessWidget {
         },
       ),
       body: _buildBodySection(context, authProvider),
-      //body: WillPopScope(onWillPop: () async => false, child: _buildBodySection(context, authProvider)),
     );
   }
 
@@ -181,8 +167,6 @@ class ListsScreen extends StatelessWidget {
                       },
                     ),
                     body: ItemsScreen(listId: lists[index].id),
-                    // body: WillPopScope(onWillPop: () async => false, child: ItemsScreen(listId: lists[index].id)),
-                    //const Text("List Items"),
                   ),
                 ),
               ),
@@ -232,7 +216,7 @@ class ListsScreen extends StatelessWidget {
                           autoClose: true,
                           spacing: 8,
                           onPressed: (BuildContext context) {
-                            if(kDebugMode) {
+                            if (kDebugMode) {
                               print("Deleted ${lists[index].name}");
                             }
                             //firestoreDatabase.deleteList(lists[index].id);
@@ -258,59 +242,6 @@ class ListsScreen extends StatelessWidget {
           ),
         ),
       );
-
-      // tiles.add(Dismissible(
-      //   background: Container(
-      //     color: Colors.red,
-      //     child: Center(
-      //         child: Text(
-      //       AppLocalizations.of(context).translate("todosDismissibleMsgTxt"),
-      //       style: TextStyle(color: Theme.of(context).canvasColor),
-      //     )),
-      //   ),
-      //   key: Key(lists[index].id),
-      //   onDismissed: (direction) {
-      //     firestoreDatabase.deleteTodo(lists[index]);
-      //
-      //     // _scaffoldKey.currentState!.showSnackBar(SnackBar(
-      //     _scaffoldKey.currentState!.showSnackBar(SnackBar(
-      //       backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-      //       content: Text(
-      //         AppLocalizations.of(context).translate("todosSnackBarContent") + lists[index].name,
-      //         style: TextStyle(color: Theme.of(context).canvasColor),
-      //       ),
-      //       duration: const Duration(seconds: 3),
-      //       action: SnackBarAction(
-      //         label: AppLocalizations.of(context).translate("todosSnackBarActionLbl"),
-      //         textColor: Theme.of(context).canvasColor,
-      //         onPressed: () {
-      //           firestoreDatabase.setList(lists[index]);
-      //         },
-      //       ),
-      //     ));
-      //   },
-      //   child: ListTile(
-      //     leading: Checkbox(
-      //         value: lists[index].isSelected,
-      //         onChanged: (value) {
-      //           ListModel newList = ListModel(
-      //               id: lists[index].id,
-      //               index: index,
-      //               name: lists[index].name,
-      //               isFavourite: lists[index].isFavourite,
-      //               isSelected: value!);
-      //           firestoreDatabase.setList(newList);
-      //         }),
-      //     title: GestureDetector(child: Text(lists[index].name), onDoubleTap: () => {}),
-      //     onTap: () {
-      //       // navigate to list view here
-      //       Navigator.of(context).pushNamed(Routes.list_view, arguments: lists[index]);
-      //     },
-      //     trailing: GestureDetector(
-      //         child: FavouriteStar(isFavourite: lists[index].isFavourite),
-      //         onTap: () => {_updateFavourite(lists[index], firestoreDatabase)}),
-      //   ),
-      // ));
     }
     return tiles;
   }

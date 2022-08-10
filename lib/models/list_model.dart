@@ -1,14 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class ListModel{
+class ListModel {
   final String id;
   final String name;
   final bool isFavourite;
   final bool isSelected;
   final int index;
   final Timestamp? lastUpdated;
-  // List _items = [];
-  // UnmodifiableListView get items => UnmodifiableListView(_items);
   Timestamp get curTime => Timestamp.now();
 
   ListModel({
@@ -30,7 +28,6 @@ class ListModel{
     final bool isSelected = data['isSelected'] ?? false;
     final bool isFavourite = data['isFavourite'] ?? false;
     final Timestamp lastUpdated = data['lastUpdated'] ?? Timestamp.now();
-    // final List items = data['items'] ?? [];
 
     ListModel newList = ListModel(
       id: documentId,
@@ -40,7 +37,6 @@ class ListModel{
       isFavourite: isFavourite,
       lastUpdated: lastUpdated,
     );
-    // newList._items = items;
     return newList;
   }
 
@@ -63,5 +59,4 @@ class ListModel{
       'lastUpdated': lastUpdated,
     };
   }
-
 }
