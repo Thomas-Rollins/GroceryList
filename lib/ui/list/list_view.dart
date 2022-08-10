@@ -9,6 +9,7 @@ import 'package:grocery_list/models/user_item_model.dart';
 import 'package:grocery_list/providers/auth_provider.dart';
 import 'package:grocery_list/services/firestore_database.dart';
 import 'package:grocery_list/ui/list/empty_content.dart';
+import 'package:grocery_list/ui/list/quantity_text_field.dart';
 import 'package:grocery_list/ui/shared/favourite_star.dart';
 import 'package:grocery_list/ui/shared/list_check_box.dart';
 import 'package:intl/intl.dart';
@@ -69,6 +70,7 @@ class ItemsScreen extends StatelessWidget {
                   ],
                 ),
               ),
+              QuantityTextField(listId: listId, itemId: items[index].id, quantity: items[index].quantity),
               Slidable(
                 endActionPane: ActionPane(
                   dragDismissible: false,
@@ -112,9 +114,9 @@ class ItemsScreen extends StatelessWidget {
         ),
       );
     }
-
     return tiles;
   }
+
 
   void _updateSelected(GroceryItemModel item, bool value, firestoreDatabase) {
     UserItemModel newUserItem = UserItemModel(
@@ -227,17 +229,4 @@ class ItemsScreen extends StatelessWidget {
           );
         });
   }
-
-  // void _setOrder(GroceryItemModel item, int newIndex, firestoreDatabase) {
-  //   GroceryItemModel newList = GroceryItemModel(
-  //     id: list.id,
-  //     index: newIndex,
-  //     name: list.name,
-  //     isFavourite: list.isFavourite,
-  //     isSelected: list.isSelected,
-  //     lastUpdated: list.lastUpdated,
-  //   );
-
-  //   firestoreDatabase.setList(newList);
-  // }
 }

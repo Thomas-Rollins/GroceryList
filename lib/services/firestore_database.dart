@@ -62,7 +62,7 @@ class FirestoreDatabase {
     if (groceryItem.userItem.toMap().keys.length > 1) {
       if (groceryItem.groceryListItem.toMap().keys.length == 1) {
         try {
-          await setUserItem(groceryItem.userItem, listId);
+          await setUserItem(groceryItem.userItem, groceryItem.id);
         } catch (err) {
           if (kDebugMode) {
             print(err);
@@ -73,7 +73,7 @@ class FirestoreDatabase {
         try {
           await Future.wait(
             [
-              setUserItem(groceryItem.userItem, listId),
+              setUserItem(groceryItem.userItem, groceryItem.id),
               setListItem(groceryItem.groceryListItem, listId),
             ],
           );
