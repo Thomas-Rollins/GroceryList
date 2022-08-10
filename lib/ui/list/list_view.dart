@@ -18,7 +18,6 @@ import 'package:provider/provider.dart';
 
 class ItemsScreen extends StatelessWidget {
   final String listId;
-
   const ItemsScreen({Key? key, required this.listId}) : super(key: key);
 
   @override
