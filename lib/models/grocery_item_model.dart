@@ -1,74 +1,76 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:grocery_list/models/list_item_model.dart';
+import 'package:grocery_list/models/user_item_model.dart';
 
 class GroceryItemModel {
-  String id;
-  String name;
-  int quantity;
-  String brand;
-  double costPerItem;
-  bool isFavourite;
-  bool isSelected;
-  int index;
-  Timestamp lastUpdated;
-  Timestamp dateAdded;
-  String category;
+  final ListItemModel groceryListItem;
+  final UserItemModel userItem;
 
-  //update to use nullsafe getters?
+  String get id => groceryListItem.id;
+  String get name => userItem.name ?? '(Unnamed)';
+  String get brand => userItem.brand ?? '(unset)';
+  String get category => userItem.category ?? '(unset)';
+
+  int get index => groceryListItem.index ?? -1;
+  int get quantity => groceryListItem.quantity ?? 1;
+
+  double get costPerItem => userItem.costPerItem ?? 0.00;
+  double get salePricePerItem => groceryListItem.salePricePerItem ?? 0.00;
+
+  bool get isSelected => groceryListItem.isSelected ?? false;
+  bool get isFavourite => userItem.isFavourite ?? false;
+
+  Timestamp get dateAdded => groceryListItem.dateAddedToList ?? Timestamp(0, 0);
+  Timestamp get dateCreated => userItem.dateAdded ?? Timestamp(0, 0);
+  Timestamp get lastUpdated => userItem.lastUpdated ?? Timestamp(0, 0);
+
   GroceryItemModel({
-    required this.id,
-    required this.name,
-    required this.quantity,
-    required this.brand,
-    required this.costPerItem,
-    required this.category,
-    required this.isFavourite,
-    required this.isSelected,
-    required this.index,
-    required this.lastUpdated,
-    required this.dateAdded,
+    required this.groceryListItem,
+    required this.userItem,
   });
 
-  // serialization
-  factory GroceryItemModel.fromMap(Map<String, dynamic> data, String documentId) {
+  factory GroceryItemModel.fromMap(Map<String, dynamic> data, String itemId) {
     String name = data['name'];
-    int quantity = data['quantity'];
-    String brand = data['brand'] ?? '';
-    double costPerItem = data['cost'] ?? 0.00;
-    String category = data['category'] ?? 'Unset';
-    bool isFavourite = data['isFavourite'] ?? false;
-    bool isSelected = data['isSelected'] ?? false;
-    int index = data['index'];
-    // may not need to be required?
+    String brand = data['brand'];
+    double costPerItem = data['cost'];
+    String category = data['category'];
+    bool isFavourite = data['isFavourite'];
     Timestamp lastUpdated = data['lastUpdated'];
     Timestamp dateAdded = data['dateAdded'];
+    int quantity = data['quantity'];
+    double salePricePerItem = data['salePrice'];
+    bool isSelected = data['isSelected'];
+    int? index = data['index'];
+    Timestamp dateAddedToList = data['dateAddedToList'];
 
-    return GroceryItemModel(
-        id: documentId,
-        name: name,
-        quantity: quantity,
-        brand: brand,
-        costPerItem: costPerItem,
-        isFavourite: isFavourite,
-        category: category,
-        isSelected: isSelected,
-        index: index,
-        lastUpdated: lastUpdated,
-        dateAdded: dateAdded);
+    ListItemModel newListItem = ListItemModel(
+      id: itemId,
+      quantity: quantity,
+      salePricePerItem: salePricePerItem,
+      isSelected: isSelected,
+      index: index,
+      dateAddedToList: dateAdded,
+    );
+
+    UserItemModel newUserItem = UserItemModel(
+      id: itemId,
+      name: name,
+      brand: brand,
+      costPerItem: costPerItem,
+      isFavourite: isFavourite,
+      category: category,
+      lastUpdated: lastUpdated,
+      dateAdded: dateAddedToList,
+    );
+
+    return GroceryItemModel(groceryListItem: newListItem, userItem: newUserItem);
   }
 
   Map<String, dynamic> toMap() {
+    assert(groceryListItem.id == userItem.id);
     return {
-      'id': id,
-      'name': name,
-      'quantity': quantity,
-      'brand': brand,
-      'costPerItem': costPerItem,
-      'category': category,
-      'isFavourite': isFavourite,
-      'isSelected': isSelected,
-      'index': index,
-      'lastUpdated': lastUpdated,
-      'dateAdded': dateAdded
-    };
+      ...groceryListItem.toMap(),
+      ...userItem.toMap(),
+    }..removeWhere((key, value) => value == null);
   }
 }

@@ -1,9 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
-
 import 'package:grocery_list/app_localizations.dart';
 import 'package:grocery_list/models/list_model.dart';
 import 'package:grocery_list/models/user_model.dart';
@@ -11,6 +8,9 @@ import 'package:grocery_list/providers/auth_provider.dart';
 import 'package:grocery_list/routes.dart';
 import 'package:grocery_list/services/firestore_database.dart';
 import 'package:grocery_list/ui/list/empty_content.dart';
+import 'package:grocery_list/ui/list/list_view.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../shared/favourite_star.dart';
 
@@ -21,7 +21,6 @@ class ListsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
-    final firestoreDatabase = Provider.of<FirestoreDatabase>(context, listen: false);
 
     return Scaffold(
       key: _scaffoldKey,
@@ -63,7 +62,8 @@ class ListsScreen extends StatelessWidget {
           );
         },
       ),
-      body: WillPopScope(onWillPop: () async => false, child: _buildBodySection(context, authProvider)),
+      body: _buildBodySection(context, authProvider),
+      //body: WillPopScope(onWillPop: () async => false, child: _buildBodySection(context, authProvider)),
     );
   }
 
@@ -99,15 +99,15 @@ class ListsScreen extends StatelessWidget {
               );
             } else {
               return EmptyContentWidget(
-                title: AppLocalizations.of(context).translate("todosEmptyTopMsgDefaultTxt"),
-                message: AppLocalizations.of(context).translate("todosEmptyBottomDefaultMsgTxt"),
+                title: AppLocalizations.of(context).translate("listsEmptyTopMsgDefaultTxt"),
+                message: AppLocalizations.of(context).translate("listsEmptyBottomDefaultMsgTxt"),
                 key: const Key('EmptyContentWidget'),
               );
             }
           } else if (snapshot.hasError) {
             return EmptyContentWidget(
-              title: AppLocalizations.of(context).translate("todosErrorTopMsgTxt"),
-              message: AppLocalizations.of(context).translate("todosErrorBottomMsgTxt"),
+              title: AppLocalizations.of(context).translate("listsErrorTopMsgTxt"),
+              message: AppLocalizations.of(context).translate("listsErrorBottomMsgTxt"),
               key: const Key('EmptyContentWidget'),
             );
           }
@@ -148,7 +148,7 @@ class ListsScreen extends StatelessWidget {
         GestureDetector(
           key: Key("${lists[index].id} card"),
           onTap: () => {
-            WidgetsBinding.instance?.addPostFrameCallback(
+            WidgetsBinding.instance.addPostFrameCallback(
               (_) => Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -174,12 +174,15 @@ class ListsScreen extends StatelessWidget {
                     floatingActionButton: FloatingActionButton(
                       child: const Icon(Icons.add),
                       onPressed: () {
-                        Navigator.of(context).pushNamed(
-                          Routes.create_edit_list,
-                        );
+                        // #TODO: set up new item page
+                        // Navigator.of(context).pushNamed(
+                        //   Routes.create_edit_list,
+                        // );
                       },
                     ),
-                    body: const Text("List Items"),
+                    body: ItemsScreen(listId: lists[index].id),
+                    // body: WillPopScope(onWillPop: () async => false, child: ItemsScreen(listId: lists[index].id)),
+                    //const Text("List Items"),
                   ),
                 ),
               ),
@@ -229,6 +232,9 @@ class ListsScreen extends StatelessWidget {
                           autoClose: true,
                           spacing: 8,
                           onPressed: (BuildContext context) {
+                            if(kDebugMode) {
+                              print("Deleted ${lists[index].name}");
+                            }
                             //firestoreDatabase.deleteList(lists[index].id);
                           },
                           backgroundColor: Colors.red,
