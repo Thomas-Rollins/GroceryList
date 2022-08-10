@@ -9,16 +9,15 @@ import 'package:grocery_list/models/user_item_model.dart';
 import 'package:grocery_list/providers/auth_provider.dart';
 import 'package:grocery_list/services/firestore_database.dart';
 import 'package:grocery_list/ui/list/empty_content.dart';
+import 'package:grocery_list/ui/list/price_text_field.dart';
 import 'package:grocery_list/ui/list/quantity_text_field.dart';
 import 'package:grocery_list/ui/shared/favourite_star.dart';
 import 'package:grocery_list/ui/shared/list_check_box.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-
 class ItemsScreen extends StatelessWidget {
   final String listId;
-
   const ItemsScreen({Key? key, required this.listId}) : super(key: key);
 
   @override
@@ -30,9 +29,10 @@ class ItemsScreen extends StatelessWidget {
 
   List<Widget> _buildListItems(context, items, firestoreDatabase, authProvider) {
     List<Widget> tiles = [];
-
     for (int index = 0; index < items.length; index++) {
       final String formattedDate = DateFormat('yMd').add_Hm().format(items[index].lastUpdated.toDate());
+      ValueNotifier priceValueNotifier = ValueNotifier(items[index].costPerItem);
+      double salePricePerItem = items[index].salePricePerItem;
       tiles.add(
         Card(
           key: Key('$listId/${items[index].id}'),
@@ -43,9 +43,20 @@ class ItemsScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               GestureDetector(
-                onTap: () => {
-                  _updateSelected(items[index], !items[index].isSelected, firestoreDatabase),
-                  // items[index].isSelected = !items[index].isSelected,
+                onTap: () async => {
+                  if (items[index].isSelected == true)
+                    {
+                      _updateSelected(items[index], !items[index].isSelected, firestoreDatabase),
+                    }
+                  else
+                    {
+                      salePricePerItem = await _salePriceModal(context, items[index].id, priceValueNotifier),
+                      _updateSalePrice(
+                          items[index],
+                          salePricePerItem < 0.0 ? items[index].costPerItem : salePricePerItem,
+                          !items[index].isSelected,
+                          firestoreDatabase)
+                    }
                 },
                 child: ListCheckBox(isSelected: items[index].isSelected),
               ),
@@ -117,6 +128,75 @@ class ItemsScreen extends StatelessWidget {
     return tiles;
   }
 
+  _salePriceModal(context, String itemId, ValueNotifier priceValueNotifier) async {
+    double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
+    double minHeight = height > width ? height * 0.3 : width * 0.3;
+    BuildContext dialogContext;
+    return showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          dialogContext = context;
+          return AlertDialog(
+            insetPadding: const EdgeInsets.all(0),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: SizedBox(
+                    height: minHeight,
+                    child: const Text("SalePricePerItem"),
+                  ),
+                ),
+                PriceTextField(
+                  listId: listId,
+                  itemId: itemId,
+                  priceNotifier: priceValueNotifier,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    ElevatedButton(
+                        onPressed: () => {
+                              //update value
+                              Navigator.pop(dialogContext, -1.00)
+                            },
+                        child: const Text("Cancel")),
+                    ElevatedButton(
+                        onPressed: () => {
+                              //update value
+                              if (priceValueNotifier.value >= 0.0)
+                                {Navigator.pop(dialogContext, priceValueNotifier.value)}
+                            },
+                        child: const Text("Update")),
+                  ],
+                )
+              ],
+            ),
+          );
+        }).then((val) {
+      return val;
+    });
+  }
+
+  void _updateSalePrice(GroceryItemModel item, double salePrice, bool isSelected, firestoreDatabase) {
+    ListItemModel newListItem = ListItemModel(
+      id: item.groceryListItem.id,
+      isSelected: isSelected,
+      salePricePerItem: salePrice,
+    );
+
+    UserItemModel newUserItem = UserItemModel(
+      id: item.userItem.id,
+      lastUpdated: Timestamp.now(),
+    );
+
+    GroceryItemModel newGroceryItem = GroceryItemModel(groceryListItem: newListItem, userItem: newUserItem);
+    firestoreDatabase.setGroceryItem(newGroceryItem, listId);
+  }
 
   void _updateSelected(GroceryItemModel item, bool value, firestoreDatabase) {
     UserItemModel newUserItem = UserItemModel(
@@ -168,7 +248,7 @@ class ItemsScreen extends StatelessWidget {
     return StreamBuilder(
         stream: firestoreDatabase.groceryItemStream(listId: listId),
         builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
-          if (snapshot. hasData && snapshot.data != null) {
+          if (snapshot.hasData && snapshot.data != null) {
             List<dynamic> data = snapshot.data as List;
 
             List listItems = data[1] as List<ListItemModel>;
