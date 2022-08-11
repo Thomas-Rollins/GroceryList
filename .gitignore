@@ -9,6 +9,10 @@
 .history
 .svn/
 
+/.gradle/
+/ios/
+/web/
+
 # IntelliJ related
 *.iml
 *.ipr
@@ -45,6 +49,8 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-# config
+# etc
 lib/firebase_options.dart
 pubspec.lock
+/local.properties
+

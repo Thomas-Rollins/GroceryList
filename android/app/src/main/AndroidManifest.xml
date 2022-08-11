@@ -1,17 +1,24 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.grocery_list">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="io.nullhorizon.grocery_list"
+    android:versionCode="0000001"
+    android:versionName="0.0.1">
+    <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="31" />
    <application
-        android:label="grocery_list"
-        android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:label="@string/applicationLabel"
+        android:icon="@mipmap/ic_launcher"
+       >
+
         <activity
             android:name=".MainActivity"
+            android:icon="@mipmap/ic_launcher"
             android:exported="true"
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
-            android:windowSoftInputMode="adjustResize">
+            android:windowSoftInputMode="adjustResize"
+            tools:ignore="Instantiatable">
             <!-- Specifies an Android theme to apply to this Activity as soon as
                  the Android process has started. This theme is visible to the user
                  while the Flutter UI initializes. After that, this theme continues
