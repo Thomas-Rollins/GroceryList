@@ -30,7 +30,7 @@ class ListsScreen extends StatelessWidget {
             builder: (context, snapshot) {
               final UserModel? user = snapshot.data as UserModel?;
               return Text(user != null && user.uid != 'null'
-                  ? user.email! + " - " + AppLocalizations.of(context).translate("homeAppBarTitle")
+                  ? "${user.email!} - ${AppLocalizations.of(context).translate("homeAppBarTitle")}"
                   : AppLocalizations.of(context).translate("homeAppBarTitle"));
             }),
         actions: <Widget>[
@@ -61,26 +61,28 @@ class ListsScreen extends StatelessWidget {
           if (snapshot.hasData) {
             List<ListModel> lists = snapshot.data as List<ListModel>;
             if (lists.isNotEmpty) {
-              lists.sort((a, b) => a.index.compareTo(b.index));
+              lists.sort((a, b) => a.index!.compareTo(b.index!));
               return ReorderableListView(
                 children: _buildListItems(context, lists, firestoreDatabase, authProvider),
                 onReorder: (int oldIndex, int newIndex) {
                   if (oldIndex < newIndex) {
                     newIndex--;
                   }
+                  List<Map<String, int>> newOrder = [];
                   // set old index to new
-                  _setOrder(lists[oldIndex], newIndex, firestoreDatabase);
+                  newOrder.add({lists[oldIndex].id: newIndex});
 
                   // iterate over list and adjust the rest of the indices
                   if (oldIndex < newIndex) {
                     for (int i = newIndex; i > oldIndex; i--) {
-                      _setOrder(lists[i], lists[i].index - 1, firestoreDatabase);
+                      newOrder.add({lists[i].id: lists[i].index! - 1});
                     }
                   } else {
                     for (int i = newIndex; i < oldIndex; i++) {
-                      _setOrder(lists[i], lists[i].index + 1, firestoreDatabase);
+                      newOrder.add({lists[i].id: lists[i].index! + 1});
                     }
                   }
+                  _setOrder(newOrder, firestoreDatabase);
                 },
               );
             } else {
@@ -101,27 +103,20 @@ class ListsScreen extends StatelessWidget {
         });
   }
 
-  void _setOrder(ListModel list, int newIndex, firestoreDatabase) {
-    ListModel newList = ListModel(
-      id: list.id,
-      index: newIndex,
-      name: list.name,
-      isFavourite: list.isFavourite,
-      isSelected: list.isSelected,
-      lastUpdated: list.lastUpdated,
-    );
-
-    firestoreDatabase.setList(newList);
+  void _setOrder(List<Map<String, int>> newOrder, firestoreDatabase) {
+    List<ListModel> lists = [];
+    for (final item in newOrder) {
+      ListModel newList = ListModel(
+        id: item.keys.first,
+        index: item.values.first,
+      );
+      lists.add(newList);
+    }
+    firestoreDatabase.batchSetList(lists);
   }
 
   void _updateFavourite(ListModel list, firestoreDatabase) {
-    ListModel newList = ListModel(
-        id: list.id,
-        index: list.index,
-        name: list.name,
-        isFavourite: !list.isFavourite,
-        isSelected: list.isSelected,
-        lastUpdated: list.curTime);
+    ListModel newList = ListModel(id: list.id, isFavourite: !(list.isFavourite ?? true), lastUpdated: list.curTime);
     firestoreDatabase.setList(newList);
   }
 
@@ -146,7 +141,7 @@ class ListsScreen extends StatelessWidget {
                           builder: (context, snapshot) {
                             final UserModel? user = snapshot.data as UserModel?;
                             return Text(user != null && user.uid != 'null'
-                                ? user.email! + " - " + lists[index].name
+                                ? "${user.email!} - ${lists[index].name}"
                                 : AppLocalizations.of(context).translate("homeAppBarTitle"));
                           }),
                       actions: <Widget>[

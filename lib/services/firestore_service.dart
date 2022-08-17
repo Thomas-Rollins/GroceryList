@@ -25,6 +25,26 @@ class FirestoreService {
     await reference.set(data, SetOptions(merge: merge));
   }
 
+  Future<void> batchSet({
+    required Map<String, Map<String, dynamic>> data,
+    bool merge = true,
+  }) async {
+    final batch = FirebaseFirestore.instance.batch();
+
+    for (final mapEntry in data.entries) {
+      final obj = mapEntry.value;
+      final reference = FirebaseFirestore.instance.doc(mapEntry.key);
+      batch.set(reference, obj, SetOptions(merge: merge));
+      if (kDebugMode) {
+        print(obj);
+      }
+    }
+
+    await batch.commit().catchError((err) => {
+          if (kDebugMode) {print(err)}
+        });
+  }
+
   Future<void> deleteData({required String path}) async {
     final reference = FirebaseFirestore.instance.doc(path);
     if (kDebugMode) {
@@ -36,6 +56,7 @@ class FirestoreService {
   Stream<List<T>> collectionStream<T>({
     required String path,
     required T Function(Map<String, dynamic> data, String documentID) builder,
+    Map<String, String>? equalityFilter,
     Query Function(Query query)? queryBuilder,
     int Function(T lhs, T rhs)? sort,
   }) {
@@ -65,8 +86,5 @@ class FirestoreService {
     return snapshots.map((snapshot) => builder(snapshot.data() as Map<String, dynamic>, snapshot.id));
   }
 
-  Stream<List> mergeStreams<T>({
-    required Iterable<Stream<T>> streams
-  }) => Rx.combineLatestList(streams);
-
+  Stream<List> mergeStreams<T>({required Iterable<Stream<T>> streams}) => Rx.combineLatestList(streams);
 }

@@ -28,6 +28,23 @@ class FirestoreDatabase {
     }
   }
 
+  Future<void> batchSetList(List<ListModel> lists) async {
+    if (lists.isEmpty) {
+      return;
+    }
+    try {
+      Map<String, Map<String, dynamic>> data = {};
+      for (ListModel item in lists) {
+        data[FirestorePath.groceryList(uid, item.id)] = item.toMap();
+      }
+      await _firestoreService.batchSet(data: data);
+    } catch (err) {
+      if (kDebugMode) {
+        print(err);
+      }
+    }
+  }
+
   // create/update ListItemModel
   Future<void> setListItem(ListItemModel listItem, String listId) async {
     try {
@@ -145,14 +162,14 @@ class FirestoreDatabase {
       );
 
   // retrieve all user items
-  Stream<List<UserItemModel>> userItemsStream({required String listId}) => _firestoreService.collectionStream(
+  Stream<List<UserItemModel>> userItemsStream() => _firestoreService.collectionStream(
         path: FirestorePath.items(uid),
         builder: (data, documentId) => UserItemModel.fromMap(data, documentId),
       );
 
   // retrieve all item data for list
   Stream<List> groceryItemStream({required String listId}) => _firestoreService.mergeStreams(streams: [
-        userItemsStream(listId: listId),
+        userItemsStream(),
         listItemsStream(listId: listId),
       ]);
 }
