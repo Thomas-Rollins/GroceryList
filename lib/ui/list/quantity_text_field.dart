@@ -56,12 +56,10 @@ class _QuantityTextFieldState extends State<QuantityTextField> {
   @override
   Widget build(BuildContext context) {
     final firestoreDatabase = Provider.of<FirestoreDatabase>(context, listen: false);
-    int quantity = _quantity;
     return GestureDetector(
       onDoubleTap: () async {
-        int newVal = await _showModal(context);
-        quantity = newVal;
-        if (quantity != _quantity) {
+          int newVal = await _showModal(context);
+        if (newVal != _quantity) {
           updateQuantity(newVal, firestoreDatabase);
           _quantityController.text = newVal.toString();
         }
@@ -71,7 +69,7 @@ class _QuantityTextFieldState extends State<QuantityTextField> {
         child: TextField(
           decoration: InputDecoration(
             border: const UnderlineInputBorder(),
-            errorText: _isEmptyQuantity ? "" : null,
+            errorText: _isEmptyQuantity ? " " : null,
           ),
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           keyboardType: const TextInputType.numberWithOptions(
@@ -80,17 +78,18 @@ class _QuantityTextFieldState extends State<QuantityTextField> {
           ),
           textAlign: TextAlign.center,
           controller: _quantityController,
-          onChanged: (value) => (() {
-            setState(() {
-              _isEmptyQuantity = value.isEmpty;
-            });
-          }),
+          onChanged: (value)  {
+            _isEmptyQuantity = value.isEmpty;
+            if(!_isEmptyQuantity) {
+              _quantity = int.parse(value);
+            }
+          },
           onSubmitted: (String value) {
-            if (value != "") {
+            _isEmptyQuantity = value.isEmpty;
+            if (!_isEmptyQuantity) {
               updateQuantity(int.parse(value), firestoreDatabase);
             } else {
               _quantityController.text = _quantity.toString();
-              setState(() {});
             }
           },
           style: const TextStyle(

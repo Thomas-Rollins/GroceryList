@@ -21,6 +21,8 @@ class UserItemModel {
     this.lastUpdated,
   });
 
+  Timestamp get curTime => Timestamp.now();
+
   // serialization
   factory UserItemModel.fromMap(Map<String, dynamic> data, String documentId) {
     String id = documentId;

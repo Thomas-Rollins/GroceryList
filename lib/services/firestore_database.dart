@@ -60,7 +60,7 @@ class FirestoreDatabase {
   }
 
   // create/update UserItemModel
-  Future<void> setUserItem(UserItemModel userItem, String listId) async {
+  Future<void> setUserItem(UserItemModel userItem) async {
     try {
       await _firestoreService.set(
         path: FirestorePath.item(uid, userItem.id),
@@ -79,7 +79,7 @@ class FirestoreDatabase {
     if (groceryItem.userItem.toMap().keys.length > 1) {
       if (groceryItem.groceryListItem.toMap().keys.length == 1) {
         try {
-          await setUserItem(groceryItem.userItem, groceryItem.id);
+          await setUserItem(groceryItem.userItem);
         } catch (err) {
           if (kDebugMode) {
             print(err);
@@ -90,7 +90,7 @@ class FirestoreDatabase {
         try {
           await Future.wait(
             [
-              setUserItem(groceryItem.userItem, groceryItem.id),
+              setUserItem(groceryItem.userItem),
               setListItem(groceryItem.groceryListItem, listId),
             ],
           );

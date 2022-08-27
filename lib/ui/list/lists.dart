@@ -45,7 +45,7 @@ class ListsScreen extends StatelessWidget {
         child: const Icon(Icons.add),
         onPressed: () {
           Navigator.of(context).pushNamed(
-            Routes.create_edit_list,
+            Routes.user_items_view,
           );
         },
       ),
@@ -227,8 +227,9 @@ class ListsScreen extends StatelessWidget {
                       width: 100,
                       height: 40,
                       child: GestureDetector(
-                          child: FavouriteStar(isFavourite: lists[index].isFavourite),
-                          onTap: () => {_updateFavourite(lists[index], firestoreDatabase)}),
+                        child: FavouriteStar(isFavourite: lists[index].isFavourite),
+                        onTap: () => {_updateFavourite(lists[index], firestoreDatabase)},
+                      ),
                     ),
                   ),
                 ),

@@ -217,7 +217,7 @@ class ItemsScreen extends StatelessWidget {
     UserItemModel newUserItem = UserItemModel(
       id: item.userItem.id,
       isFavourite: value,
-      lastUpdated: Timestamp.now(),
+      lastUpdated: item.curTime,
     );
 
     ListItemModel newListItem = ListItemModel(

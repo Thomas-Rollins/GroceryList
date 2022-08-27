@@ -24,6 +24,8 @@ class GroceryItemModel {
   Timestamp get dateCreated => userItem.dateAdded ?? Timestamp(0, 0);
   Timestamp get lastUpdated => userItem.lastUpdated ?? Timestamp(0, 0);
 
+  Timestamp get curTime => Timestamp.now();
+
   GroceryItemModel({
     required this.groceryListItem,
     required this.userItem,

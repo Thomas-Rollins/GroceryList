@@ -17,6 +17,8 @@ class ListItemModel {
     this.dateAddedToList,
   });
 
+  Timestamp get curTime => Timestamp.now();
+
   // serialization
   factory ListItemModel.fromMap(Map<String, dynamic> data, String documentId) {
     String id = data['id'];
